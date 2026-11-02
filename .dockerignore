@@ -1,0 +1,11 @@
+.env
+venv/
+__pycache__/
+*.pyc
+travel.db
+uploads/
+secrets/
+.git/
+.claude/
+Tickets/
+Tickets.zip
