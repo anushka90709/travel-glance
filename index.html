@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travel Glance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body
+  data-google-client-id="{{ google_client_id }}"
+  data-google-api-key="{{ google_api_key }}"
+  data-google-app-id="{{ google_app_id }}"
+  data-user-email="{{ user.email if user else '' }}"
+  data-allowed-domains="{{ allowed_domains|join(',') }}"
+>
+  <div id="app">
+    <div id="uploadStatus" class="upload-status" hidden></div>
+
+    <div class="app-body">
+      <nav class="side-tabs" role="tablist" id="sideTabs">
+        <div class="sidebar-header-row">
+          <div class="sidebar-brand">
+            <img class="sidebar-brand-logo" src="{{ url_for('static', filename='netcore-logo.svg') }}" alt="Netcore">
+          </div>
+          <button class="sidebar-toggle" id="sidebarToggleBtn" type="button" aria-label="Collapse sidebar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        </div>
+
+        <div class="sidebar-app-card">
+          <span class="sidebar-app-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+          </span>
+          <span class="sidebar-app-text">
+            <span class="sidebar-app-name">Travel Glance</span>
+            <span class="sidebar-app-meta">Flight workspace</span>
+          </span>
+        </div>
+
+        <div class="sidebar-nav">
+          <div class="sidebar-section-label">Workspace</div>
+          <button class="side-tab-btn active" id="tabCalendarBtn" type="button" role="tab" aria-selected="true" title="Calendar">
+            <svg class="side-tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
+            <span class="side-tab-label">Calendar</span>
+          </button>
+          <button class="side-tab-btn" id="tabDirectoryBtn" type="button" role="tab" aria-selected="false" title="Traveler Directory">
+            <svg class="side-tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M15 20c0-2.2 1-4 3-4.5"/></svg>
+            <span class="side-tab-label">Directory</span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="app-content">
+        <div class="content-header">
+          <div>
+            <h2 class="view-title" id="viewTitle">Calendar</h2>
+            <p class="view-tagline" id="viewTagline">Everyone's flights at a glance.</p>
+          </div>
+          <div class="content-header-right">
+            <div class="upload-zone" id="uploadZone">
+              <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="Switch to dark mode">
+                <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>
+                <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+              </button>
+              <button id="driveAttachBtn" class="btn btn-primary" type="button" hidden>Attach from Google Drive</button>
+              <button id="deviceAttachBtn" class="btn btn-ghost" type="button" hidden>Attach from device</button>
+              <input type="file" id="deviceFileInput" accept="application/pdf" multiple hidden>
+            </div>
+
+            {% if user %}
+            <div class="topbar-user" id="topbarUser">
+              <button class="topbar-user-trigger" id="topbarUserTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+                {% if user.picture %}
+                <img class="topbar-user-avatar" src="{{ user.picture }}" alt="">
+                {% else %}
+                <span class="topbar-user-avatar topbar-user-avatar-fallback">{{ user.name[0]|upper }}</span>
+                {% endif %}
+                <span class="topbar-user-name">{{ user.name }}</span>
+                <svg class="topbar-user-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="topbar-user-menu" id="topbarUserMenu" hidden>
+                <div class="topbar-user-menu-email" title="{{ user.email }}">{{ user.email }}</div>
+                <button class="topbar-user-menu-item" id="logoutBtn" type="button">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  Sign out
+                </button>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div id="calendarView">
+          <div class="stat-row">
+            <div class="stat-card">
+              <span class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+              </span>
+              <div class="stat-copy">
+                <span class="stat-label">Total trips</span>
+                <span class="stat-value" id="statTotalTrips">0</span>
+              </div>
+            </div>
+            <div class="stat-card stat-card-good">
+              <span class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <div class="stat-copy">
+                <span class="stat-label">Confirmed</span>
+                <span class="stat-value stat-value-good" id="statConfirmedTrips">0</span>
+              </div>
+            </div>
+            <div class="stat-card stat-card-people">
+              <span class="stat-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M15 20c0-2.2 1-4 3-4.5"/></svg>
+              </span>
+              <div class="stat-copy">
+                <span class="stat-label">Travelers</span>
+                <span class="stat-value" id="statTravelers">0</span>
+              </div>
+            </div>
+          </div>
+
+          <section class="calendar-shell">
+            <div class="calendar-controls">
+              <div class="nav-group">
+                <button id="prevMonth" class="btn btn-ghost icon-btn" aria-label="Previous month">‹</button>
+                <div class="month-picker" id="monthPicker">
+                  <button type="button" class="month-picker-btn" id="monthPickerBtn" aria-haspopup="true" aria-expanded="false">
+                    <h2 id="monthLabel"></h2>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="month-picker-menu" id="monthPickerMenu" hidden>
+                    <div class="month-picker-year-row">
+                      <button type="button" id="monthPickerYearPrev" aria-label="Previous year">‹</button>
+                      <span id="monthPickerYearLabel"></span>
+                      <button type="button" id="monthPickerYearNext" aria-label="Next year">›</button>
+                    </div>
+                    <div class="month-picker-grid" id="monthPickerGrid"></div>
+                  </div>
+                </div>
+                <button id="nextMonth" class="btn btn-ghost icon-btn" aria-label="Next month">›</button>
+                <button id="todayBtn" class="btn btn-ghost today-btn" type="button">Today</button>
+              </div>
+              <div class="control-group">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="showCancelled" checked>
+                  <span class="toggle-track"></span>
+                  <span class="toggle-switch-label">Show cancelled</span>
+                </label>
+                <button id="clearAllBtn" class="link-danger" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  Clear all trips&hellip;
+                </button>
+              </div>
+            </div>
+
+            <div class="calendar-scroll">
+              <div class="weekday-row">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
+              <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+
+            <div class="legend" id="legend"></div>
+          </section>
+        </div>
+
+        <div id="directoryView" hidden>
+          <section class="directory-shell">
+            <div class="directory-controls">
+              <label class="directory-search-wrap">
+                <svg class="directory-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="search" id="travelerSearch" class="directory-search" placeholder="Search name, airline, PNR, route&hellip;">
+              </label>
+              <select id="directoryTypeFilter" class="directory-type-filter">
+                <option value="all">All trips</option>
+                <option value="domestic">Domestic</option>
+                <option value="international">International</option>
+              </select>
+              <select id="directoryAirlineFilter" class="directory-type-filter">
+                <option value="all">All airlines</option>
+              </select>
+              <select id="directoryPlaceFilter" class="directory-type-filter">
+                <option value="all">All places</option>
+              </select>
+              <select id="directoryBookingSourceFilter" class="directory-type-filter">
+                <option value="all">All booking apps</option>
+              </select>
+              <div class="date-filter-dropdown" id="dateFilterDropdown">
+                <button type="button" class="date-filter-btn" id="dateFilterBtn" aria-haspopup="true" aria-expanded="false">
+                  <span id="dateFilterLabel">All dates</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="date-filter-menu" id="dateFilterMenu" hidden>
+                  <button type="button" class="date-filter-option active" data-preset="all">All dates</button>
+                  <button type="button" class="date-filter-option" data-preset="thisMonth" id="dateFilterThisMonth">This month</button>
+                  <button type="button" class="date-filter-option" data-preset="today">Today</button>
+                  <button type="button" class="date-filter-option" data-preset="last7">Last 7 days</button>
+                  <button type="button" class="date-filter-option" data-preset="last30">Last 30 days</button>
+                  <button type="button" class="date-filter-option" data-preset="custom">Custom range</button>
+                  <div class="date-filter-custom" id="dateFilterCustom" hidden>
+                    <input type="date" id="directoryDateFrom" aria-label="From date">
+                    <span class="date-range-sep">&ndash;</span>
+                    <input type="date" id="directoryDateTo" aria-label="To date">
+                  </div>
+                </div>
+              </div>
+              <button type="button" id="directoryClearFiltersBtn" class="link-danger">Clear filters</button>
+              <span class="directory-count" id="directoryCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="directory-table">
+                <thead>
+                  <tr>
+                    <th>Traveler</th>
+                    <th>Route</th>
+                    <th>Departure</th>
+                    <th>Return</th>
+                    <th>Airline</th>
+                    <th>PNR</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="directoryTableBody"></tbody>
+              </table>
+            </div>
+            <div class="directory-empty" id="directoryEmpty" hidden>
+              <p class="empty-title">No trips match</p>
+              <p class="empty-hint">Try a different name, airline, or date range.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+      <h3 id="modalTitle">Trip details</h3>
+      <span class="badge" id="modalStatusBadge"></span>
+
+      <form id="tripForm">
+        <input type="hidden" id="fieldId">
+        <div class="form-row">
+          <label>Traveler name</label>
+          <input type="text" id="fieldName" required>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label>From</label>
+            <input type="text" id="fieldOrigin" placeholder="e.g. Mumbai">
+          </div>
+          <div>
+            <label>To</label>
+            <input type="text" id="fieldDestination" placeholder="e.g. Bengaluru">
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label>Departure date</label>
+            <input type="date" id="fieldStart" required>
+          </div>
+          <div>
+            <label>Return / end date</label>
+            <input type="date" id="fieldEnd" required>
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label>Departure time</label>
+            <input type="time" id="fieldStartTime">
+          </div>
+          <div>
+            <label>Arrival / return time</label>
+            <input type="time" id="fieldEndTime">
+          </div>
+        </div>
+        <div class="form-row two-col" id="legTimesRow" hidden>
+          <div>
+            <label>Outbound arrival time</label>
+            <input type="time" id="fieldStartArrivalTime">
+          </div>
+          <div>
+            <label>Return departure time</label>
+            <input type="time" id="fieldEndDepartureTime">
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label>Airline</label>
+            <input type="text" id="fieldAirline" placeholder="e.g. IndiGo">
+          </div>
+          <div>
+            <label>PNR</label>
+            <input type="text" id="fieldPnr" placeholder="e.g. F47U6L">
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label>Price</label>
+            <input type="text" id="fieldPrice" placeholder="e.g. ₹8,450">
+          </div>
+          <div>
+            <label>Booking app</label>
+            <input type="text" id="fieldBookingSource" placeholder="e.g. MyBiz">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Notes</label>
+          <textarea id="fieldNotes" rows="2" placeholder="Optional"></textarea>
+        </div>
+
+        <p class="source-link" id="sourceLink" hidden>
+          <a id="sourceLinkAnchor" href="#" target="_blank" rel="noopener">View original itinerary PDF</a>
+        </p>
+
+        <div class="leg-actions" id="legActionsRow" hidden>
+          <p class="leg-actions-hint">Only one leg not happening as booked? Cancel it on its own &mdash; the other leg stays active.</p>
+          <div class="leg-action">
+            <span class="leg-action-label">Outbound leg</span>
+            <span class="leg-action-btns">
+              <button type="button" class="btn btn-ghost" id="toggleOutboundBtn">Cancel outbound</button>
+              <button type="button" class="btn btn-danger-ghost" id="deleteOutboundLegBtn">Delete outbound</button>
+            </span>
+          </div>
+          <div class="leg-action">
+            <span class="leg-action-label">Return leg</span>
+            <span class="leg-action-btns">
+              <button type="button" class="btn btn-ghost" id="toggleReturnBtn">Cancel return</button>
+              <button type="button" class="btn btn-danger-ghost" id="deleteReturnLegBtn">Delete return</button>
+            </span>
+          </div>
+          <p class="leg-actions-hint">Deleting a leg permanently discards it and turns this into a one-way trip for the other leg &mdash; not reversible.</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-warn" id="cancelTripBtn">Cancel trip</button>
+          <button type="button" class="btn btn-ghost" id="restoreTripBtn" hidden>Restore trip</button>
+          <button type="button" class="btn btn-danger-ghost" id="deleteTripBtn">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="dayModalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
+      <button class="modal-close" id="dayModalCloseBtn" aria-label="Close">&times;</button>
+      <h3 id="dayModalTitle">Trips</h3>
+      <ul class="day-trip-list" id="dayTripList"></ul>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script async defer src="https://apis.google.com/js/api.js" onload="window.__gapiLoaded()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="window.__gisLoaded()"></script>
+</body>
+</html>

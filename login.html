@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in &middot; Travel Glance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body data-google-client-id="{{ google_client_id }}">
+  <div class="login-scene">
+
+    <svg class="login-sky" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g class="sky-stars">
+        <circle class="star" cx="110" cy="70" r="1.6" style="animation-delay:0s"/>
+        <circle class="star" cx="240" cy="140" r="1.1" style="animation-delay:0.7s"/>
+        <circle class="star" cx="360" cy="60" r="1.4" style="animation-delay:1.4s"/>
+        <circle class="star" cx="470" cy="180" r="1"   style="animation-delay:2.1s"/>
+        <circle class="star" cx="70"  cy="220" r="1.2" style="animation-delay:0.3s"/>
+        <circle class="star" cx="580" cy="90"  r="1.5" style="animation-delay:1.8s"/>
+        <circle class="star" cx="180" cy="260" r="1"   style="animation-delay:2.6s"/>
+        <circle class="star" cx="920" cy="80"  r="1.3" style="animation-delay:1s"/>
+        <circle class="star" cx="1030" cy="180" r="1.1" style="animation-delay:0.4s"/>
+        <circle class="star" cx="850" cy="200" r="1"   style="animation-delay:2.2s"/>
+      </g>
+
+      <path id="skyPath" class="sky-route" fill="none"
+        d="M 60,660 C 260,600 360,520 500,440 C 660,350 760,260 1010,110" />
+      <circle class="route-dot route-dot-start" cx="60" cy="660" r="4" />
+      <g class="route-anim">
+        <circle class="route-pulse" cx="1010" cy="110" r="5" />
+        <circle class="route-dot route-dot-end" cx="1010" cy="110" r="4" />
+        <g class="route-plane">
+          <path d="M -12,-4.5 L 12,0 L -12,4.5 L -4.5,0 Z" />
+          <animateMotion dur="9s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#skyPath" />
+          </animateMotion>
+        </g>
+      </g>
+
+      <g class="sky-clouds">
+        <ellipse class="cloud cloud-1" cx="160" cy="700" rx="130" ry="22" />
+        <ellipse class="cloud cloud-2" cx="620" cy="750" rx="170" ry="26" />
+        <ellipse class="cloud cloud-3" cx="980" cy="710" rx="140" ry="20" />
+      </g>
+    </svg>
+
+    <div class="login-card-wrap">
+      <div class="login-card">
+        <span class="login-netcore-pill">
+          <img class="login-netcore-logo" src="{{ url_for('static', filename='netcore-logo.svg') }}" alt="Netcore">
+          <span class="login-brand-sep" aria-hidden="true"></span>
+          <span class="login-unbxd-mark">Unbxd</span>
+        </span>
+
+        <p class="login-wordmark">
+          <svg class="login-wordmark-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+          Travel Glance
+        </p>
+        <h1 class="login-title">Sign in</h1>
+        <p class="login-tagline">
+          Everyone&rsquo;s flights, one shared calendar &mdash; sign in with your
+          Netcore or Unbxd Google account to continue.
+        </p>
+
+        <div id="googleSignInBtn" class="google-signin-slot"></div>
+
+        <p id="loginError" class="login-error" hidden></p>
+
+        <div class="login-divider" aria-hidden="true"></div>
+
+        <div class="login-secure-note">
+          <span class="login-secure-check" aria-hidden="true">&#10003;</span>
+          <span>
+            Only <strong>Netcore and Unbxd Google accounts</strong> are allowed &mdash;
+            {% for d in allowed_domains %}<span class="login-domain">@{{ d }}</span>{% if not loop.last %}, {% endif %}{% endfor %}.
+          </span>
+        </div>
+
+        <p class="login-footer">
+          By signing in, you agree to Netcore&rsquo;s and Unbxd&rsquo;s internal use policies.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="{{ url_for('static', filename='login.js') }}"></script>
+</body>
+</html>

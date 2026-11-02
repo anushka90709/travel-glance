@@ -1,0 +1,254 @@
+/* Sign-in page. A single atmospheric scene (dusk flight view) with a
+   floating card, rather than a flat two-column split - deliberately
+   theme-independent (always this look), since it's a front door, not part
+   of the app's light/dark toggle. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1c1626;
+  letter-spacing: -0.011em;
+}
+
+.login-scene {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #0a0e26 0%,
+    #171b45 20%,
+    #3c2a5e 40%,
+    #8a3f5a 58%,
+    #dd6a3f 74%,
+    #f2a35f 88%,
+    #ffd7a3 100%
+  );
+}
+
+.login-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.star {
+  fill: #fff;
+  animation: star-twinkle 3.2s ease-in-out infinite;
+}
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
+}
+
+.sky-route {
+  stroke: rgba(255,255,255,0.28);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 7;
+}
+.route-dot { fill: rgba(255,255,255,0.55); }
+.route-dot-end { fill: #ffcf8a; }
+.route-pulse {
+  fill: none;
+  stroke: #ffcf8a;
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: route-pulse 2.4s ease-out infinite;
+}
+.route-plane path {
+  fill: #fff6ea;
+  filter: drop-shadow(0 0 6px rgba(255,207,138,0.8));
+}
+@keyframes route-pulse {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+.cloud {
+  fill: rgba(255,255,255,0.18);
+  filter: blur(10px);
+}
+.cloud-1 { animation: cloud-drift 46s ease-in-out infinite; }
+.cloud-2 { animation: cloud-drift 60s ease-in-out infinite reverse; animation-delay: -8s; }
+.cloud-3 { animation: cloud-drift 52s ease-in-out infinite; animation-delay: -20s; }
+@keyframes cloud-drift {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(60px); }
+  100% { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star, .route-pulse, .cloud { animation: none; }
+  .route-anim { display: none; }
+}
+
+/* ---------- The floating sign-in card ---------- */
+
+.login-card-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  animation: card-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.login-card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -30px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(255,207,138,0.35), rgba(255,207,138,0) 70%);
+  filter: blur(4px);
+}
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-card-wrap { animation: none; }
+}
+
+.login-card {
+  position: relative;
+  width: 100%;
+  background: #fffaf4;
+  border-radius: 20px;
+  padding: 36px 34px 30px;
+  box-shadow:
+    0 30px 70px rgba(10,6,25,0.45),
+    0 0 0 1px rgba(255,255,255,0.06);
+}
+.login-card::before {
+  content: "";
+  display: block;
+  height: 4px;
+  margin: -36px -34px 26px;
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(90deg, #3c2a5e, #dd6a3f 55%, #ffcf8a);
+}
+
+.login-netcore-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ece4d8;
+  border-radius: 999px;
+  padding: 8px 14px;
+  margin-bottom: 18px;
+}
+.login-netcore-logo { display: block; height: 18px; width: auto; }
+.login-brand-sep {
+  width: 1px;
+  height: 14px;
+  background: #ece4d8;
+}
+.login-unbxd-mark {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1c1626;
+}
+
+.login-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d6491a;
+}
+.login-wordmark-icon { flex-shrink: 0; }
+
+.login-title {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #1c1626;
+}
+.login-tagline {
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #5c5468;
+}
+
+.google-signin-slot {
+  min-height: 44px;
+  display: flex;
+}
+.google-signin-slot > div { width: 100% !important; }
+
+.login-error {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(208,59,59,0.1);
+  color: #b32d2d;
+  font-size: 0.85rem;
+}
+
+.login-divider {
+  height: 1px;
+  margin: 26px 0 16px;
+  background: #e8e0d2;
+}
+
+.login-secure-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fff9f0, #fdf0e4);
+  border: 1px solid #f1e2cf;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #5c5468;
+}
+.login-secure-check {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fce7dc;
+  color: #d6491a;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.login-domain {
+  color: #d6491a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.login-footer {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: #8a8494;
+}
+
+@media (max-width: 480px) {
+  .login-scene { padding: 20px; }
+  .login-card { padding: 30px 22px 24px; }
+}
